@@ -3,4 +3,5 @@ export interface Todo {
   description?: string
   tags: string[]
   expiresAt?: Date
+  done: boolean
 }

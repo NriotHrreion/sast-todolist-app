@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const notoSansSC = localFont({
+  src: [
+    { path: "../assets/NotoSansSC-VariableFont_wght.ttf", style: "normal" },
+    { path: "../assets/NotoSans-VariableFont_wdth,wght.ttf", style: "normal" },
+  ]
 });
 
 export const metadata: Metadata = {
@@ -24,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-cn">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased w-[100vw] h-[100vh]`}>
+      <body className={cn("antialiased w-[100vw] h-[100vh]", notoSansSC.className)}>
         {children}
       </body>
     </html>
