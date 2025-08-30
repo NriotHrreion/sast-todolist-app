@@ -78,7 +78,7 @@ function TagsInput({ tags, onTagsChange, ...props }: React.ComponentProps<typeof
               onClick={(e) => {
                 e.preventDefault()
                 tagsRef.current.delete(tag)
-                trigger()
+                onTagsChange && onTagsChange(Array.from(tagsRef.current));
               }}>
               <X size={6}/>
             </Button>

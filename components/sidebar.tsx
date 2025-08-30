@@ -2,10 +2,10 @@
 
 import type { Todo } from "@/lib/types";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { getAvailableTags, loadTodoList, saveTodoList, setTodoItemDone } from "@/lib/storage";
+import { getAvailableTags, loadTodoList, removeTodoItem, saveTodoList, setTodoItemDone } from "@/lib/storage";
 import { TodoContext } from "@/contexts/todo-context";
 import { Badge } from "./ui/badge";
-import { CheckCheck, Plus, Trash2, TriangleAlert } from "lucide-react";
+import { CheckCheck, Plus, Trash2 } from "lucide-react";
 import { Checkbox } from "./ui/checkbox";
 import { Button } from "./ui/button";
 import { emitter } from "@/lib/emitter";
@@ -26,17 +26,17 @@ function TodoItem({
   const [checked, setChecked] = useState(done);
   const isCurrent = currentItem === id;
   const tagSet = useMemo(() => new Set(tags), [tags]);
-  const isExpired = (
-    typeof window === "undefined"
-    ? false
-    : (
-      expiresAt && (new Date().getMilliseconds() > expiresAt.getMilliseconds())
-    )
-  );
 
   useEffect(() => {
     setChecked(done);
   }, [done]);
+
+  useEffect(() => {
+    if(!expiresAt) return;
+    if(new Date().getTime() > expiresAt.getTime()) {
+      removeTodoItem(id);
+    }
+  }, [expiresAt, id]);
   
   return (
     <div
@@ -55,12 +55,6 @@ function TodoItem({
       </div>
       <span className="text-muted-foreground text-sm whitespace-nowrap overflow-hidden text-ellipsis">{description}</span>
       <div className="wrap-break-word space-x-2">
-        {isExpired && (
-          <Badge variant="destructive">
-            <TriangleAlert />
-            已超时
-          </Badge>
-        )}
         {Array.from(tagSet).map((tag, i) => (
           <Badge
             variant="outline"

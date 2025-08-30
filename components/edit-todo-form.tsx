@@ -1,7 +1,7 @@
 "use client";
 
 import type { Todo } from "@/lib/types";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
@@ -12,7 +12,7 @@ import { DatePicker } from "./ui/date-picker";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
-import { addTodoItem, editTodoItem, removeTodoItem } from "@/lib/storage";
+import { editTodoItem, removeTodoItem } from "@/lib/storage";
 import { TodoContext } from "@/contexts/todo-context";
 
 const formSchema = z.object({
@@ -33,14 +33,18 @@ export function EditTodoForm({
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    values: {
       title,
       description,
       tags,
       expiresAt
     }
   });
-  const [hasDeadline, setHasDeadline] = useState(false);
+  const [hasDeadline, setHasDeadline] = useState(expiresAt !== undefined);
+
+  useEffect(() => {
+    setHasDeadline(expiresAt !== undefined);
+  }, [expiresAt]);
 
   if(!currentItem) return <></>;
 
@@ -90,7 +94,10 @@ export function EditTodoForm({
               <FormItem>
                 <FormLabel>标签</FormLabel>
                 <FormControl>
-                  <TagsInput tags={field.value} onTagsChange={field.onChange} placeholder="输入新标签名称..."/>
+                  <TagsInput
+                    tags={field.value}
+                    onTagsChange={field.onChange}
+                    placeholder="输入新标签名称..."/>
                 </FormControl>
                 <FormDescription className="text-xs">输入标签名称后按下回车以添加标签</FormDescription>
                 <FormMessage />
@@ -106,7 +113,7 @@ export function EditTodoForm({
                   <div className="space-y-2 mt-2">
                     <div className="flex items-center gap-2">
                       <Checkbox
-                        defaultChecked={hasDeadline}
+                        checked={hasDeadline}
                         onCheckedChange={(checked) => {
                           field.onChange(!checked ? undefined : new Date());
                           setHasDeadline(checked as boolean);
